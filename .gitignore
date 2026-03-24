@@ -1,0 +1,13 @@
+node_modules/
+.env
+workspace/downloads/
+workspace/cleaned/
+workspace/tts/
+workspace/output/
+workspace/logs/
+nginx/ssl/*.pem
+n8n_data/
+*.mp4
+*.mp3
+*.tar.gz
+.DS_Store

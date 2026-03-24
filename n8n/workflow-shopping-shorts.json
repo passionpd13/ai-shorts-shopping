@@ -1,0 +1,447 @@
+{
+  "name": "Shopping Shorts - OpenClaw Webhooks",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "shopping-shorts/coupang-search",
+        "responseMode": "responseNode"
+      },
+      "id": "wh-coupang",
+      "name": "Webhook: Coupang Search",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 100]
+    },
+    {
+      "parameters": {
+        "jsCode": "const crypto = require('crypto');\nconst item = $input.first().json;\nconst action = item.body?.action || 'best_products';\nconst categoryId = item.body?.categoryId || '1014';\nconst limit = item.body?.limit || 10;\n\nconst ACCESS_KEY = $env.COUPANG_ACCESS_KEY;\nconst SECRET_KEY = $env.COUPANG_SECRET_KEY;\n\nconst datetime = new Date().toISOString().replace(/[-:.TZ]/g, '').slice(0, 14);\nconst method = 'GET';\nconst path = `/v2/providers/affiliate_open_api/apis/openapi/products/bestcategories/${categoryId}`;\nconst query = `limit=${limit}`;\n\nconst message = `${datetime}${method}${path}${query}`;\nconst signature = crypto.createHmac('sha256', SECRET_KEY).update(message).digest('hex');\nconst authorization = `CEA algorithm=HmacSHA256, access-key=${ACCESS_KEY}, signed-date=${datetime}, signature=${signature}`;\n\nreturn [{\n  json: {\n    url: `https://api-gateway.coupang.com${path}?${query}`,\n    headers: { Authorization: authorization }\n  }\n}];"
+      },
+      "id": "code-coupang-hmac",
+      "name": "Coupang HMAC Sign",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [420, 100]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "={{ $json.url }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "={{ $json.headers.Authorization }}" }
+          ]
+        }
+      },
+      "id": "http-coupang",
+      "name": "Coupang API Call",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [640, 100]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}"
+      },
+      "id": "resp-coupang",
+      "name": "Respond Coupang",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [860, 100]
+    },
+
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "shopping-shorts/ghostcut-clean",
+        "responseMode": "responseNode"
+      },
+      "id": "wh-ghostcut",
+      "name": "Webhook: GhostCut",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 350]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [{ "value1": "={{ $json.body?.action }}", "value2": "check_status" }]
+        }
+      },
+      "id": "if-ghostcut-action",
+      "name": "Is Status Check?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [420, 350]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://open.ghostcut.com/api/open/video/submit",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "={{ $env.GHOSTCUT_API_KEY }}" }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "videoUrl", "value": "={{ $json.body.videoPath }}" },
+            { "name": "needChineseOcclude", "value": "={{ $json.body.options?.needChineseOcclude || 1 }}" },
+            { "name": "needCrop", "value": "={{ $json.body.options?.needCrop || 0 }}" }
+          ]
+        }
+      },
+      "id": "http-ghostcut-submit",
+      "name": "GhostCut Submit",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [640, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://open.ghostcut.com/api/open/video/query?taskId={{ $json.body.taskId }}",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "={{ $env.GHOSTCUT_API_KEY }}" }
+          ]
+        }
+      },
+      "id": "http-ghostcut-status",
+      "name": "GhostCut Status",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [640, 420]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}"
+      },
+      "id": "resp-ghostcut",
+      "name": "Respond GhostCut",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [860, 350]
+    },
+
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "shopping-shorts/deploy-youtube",
+        "responseMode": "responseNode"
+      },
+      "id": "wh-youtube",
+      "name": "Webhook: YouTube",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 600]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://www.googleapis.com/upload/youtube/v3/videos?part=snippet,status&uploadType=multipart",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "=Bearer {{ $env.YOUTUBE_ACCESS_TOKEN }}" }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "snippet.title", "value": "={{ $json.body.title }}" },
+            { "name": "snippet.description", "value": "={{ $json.body.description }}" },
+            { "name": "snippet.categoryId", "value": "={{ $json.body.categoryId || '22' }}" },
+            { "name": "status.privacyStatus", "value": "={{ $json.body.privacyStatus || 'public' }}" }
+          ]
+        }
+      },
+      "id": "http-youtube",
+      "name": "YouTube Upload",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [420, 600]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, videoId: $json.id, url: 'https://youtube.com/shorts/' + $json.id }) }}"
+      },
+      "id": "resp-youtube",
+      "name": "Respond YouTube",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [640, 600]
+    },
+
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "shopping-shorts/deploy-instagram",
+        "responseMode": "responseNode"
+      },
+      "id": "wh-instagram",
+      "name": "Webhook: Instagram",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 850]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v19.0/{{ $env.INSTAGRAM_BUSINESS_ID }}/media",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "video_url", "value": "={{ $json.body.videoPath }}" },
+            { "name": "caption", "value": "={{ $json.body.caption }}" },
+            { "name": "media_type", "value": "REELS" },
+            { "name": "share_to_feed", "value": "={{ $json.body.shareToFeed || true }}" },
+            { "name": "access_token", "value": "={{ $env.INSTAGRAM_ACCESS_TOKEN }}" }
+          ]
+        }
+      },
+      "id": "http-ig-container",
+      "name": "IG Create Container",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [420, 850]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v19.0/{{ $env.INSTAGRAM_BUSINESS_ID }}/media_publish",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "creation_id", "value": "={{ $json.id }}" },
+            { "name": "access_token", "value": "={{ $env.INSTAGRAM_ACCESS_TOKEN }}" }
+          ]
+        }
+      },
+      "id": "http-ig-publish",
+      "name": "IG Publish",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [640, 850]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, mediaId: $json.id }) }}"
+      },
+      "id": "resp-instagram",
+      "name": "Respond Instagram",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [860, 850]
+    },
+
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "shopping-shorts/deploy-tiktok",
+        "responseMode": "responseNode"
+      },
+      "id": "wh-tiktok",
+      "name": "Webhook: TikTok",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 1100]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://open.tiktokapis.com/v2/post/publish/video/init/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            { "name": "Authorization", "value": "=Bearer {{ $env.TIKTOK_ACCESS_TOKEN }}" },
+            { "name": "Content-Type", "value": "application/json" }
+          ]
+        },
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "post_info.title", "value": "={{ $json.body.caption }}" },
+            { "name": "post_info.privacy_level", "value": "={{ $json.body.privacyLevel || 'SELF_ONLY' }}" },
+            { "name": "post_info.disable_comment", "value": "={{ $json.body.disableComment || false }}" },
+            { "name": "source_info.source", "value": "PULL_FROM_URL" },
+            { "name": "source_info.video_url", "value": "={{ $json.body.videoPath }}" }
+          ]
+        }
+      },
+      "id": "http-tiktok",
+      "name": "TikTok Upload",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [420, 1100]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}"
+      },
+      "id": "resp-tiktok",
+      "name": "Respond TikTok",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [640, 1100]
+    },
+
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "shopping-shorts/deploy-facebook",
+        "responseMode": "responseNode"
+      },
+      "id": "wh-facebook",
+      "name": "Webhook: Facebook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 1350]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "=https://graph.facebook.com/v19.0/{{ $env.FACEBOOK_PAGE_ID }}/video_reels",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            { "name": "video_url", "value": "={{ $json.body.videoPath }}" },
+            { "name": "description", "value": "={{ $json.body.description }}" },
+            { "name": "access_token", "value": "={{ $env.FACEBOOK_PAGE_TOKEN }}" }
+          ]
+        }
+      },
+      "id": "http-facebook",
+      "name": "Facebook Reels Upload",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [420, 1350]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ success: true, reelId: $json.id }) }}"
+      },
+      "id": "resp-facebook",
+      "name": "Respond Facebook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [640, 1350]
+    },
+
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "shopping-shorts/sheets-record",
+        "responseMode": "responseNode"
+      },
+      "id": "wh-sheets",
+      "name": "Webhook: Sheets",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 1600]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            { "value1": "={{ $json.body?.action }}", "value2": "write_deployment" }
+          ]
+        }
+      },
+      "id": "switch-sheets",
+      "name": "Sheets Action Switch",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [420, 1600]
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": { "__rl": true, "mode": "id", "value": "={{ $env.GOOGLE_SHEETS_ID }}" },
+        "sheetName": "deployments",
+        "columns": {
+          "mappingMode": "autoMapInputData"
+        }
+      },
+      "id": "sheets-write",
+      "name": "Sheets Write",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [640, 1550]
+    },
+    {
+      "parameters": {
+        "operation": "read",
+        "documentId": { "__rl": true, "mode": "id", "value": "={{ $env.GOOGLE_SHEETS_ID }}" },
+        "sheetName": "deployments"
+      },
+      "id": "sheets-read",
+      "name": "Sheets Read",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4,
+      "position": [640, 1680]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}"
+      },
+      "id": "resp-sheets",
+      "name": "Respond Sheets",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [860, 1600]
+    }
+  ],
+  "connections": {
+    "Webhook: Coupang Search": { "main": [[{ "node": "Coupang HMAC Sign", "type": "main", "index": 0 }]] },
+    "Coupang HMAC Sign": { "main": [[{ "node": "Coupang API Call", "type": "main", "index": 0 }]] },
+    "Coupang API Call": { "main": [[{ "node": "Respond Coupang", "type": "main", "index": 0 }]] },
+
+    "Webhook: GhostCut": { "main": [[{ "node": "Is Status Check?", "type": "main", "index": 0 }]] },
+    "Is Status Check?": {
+      "main": [
+        [{ "node": "GhostCut Status", "type": "main", "index": 0 }],
+        [{ "node": "GhostCut Submit", "type": "main", "index": 0 }]
+      ]
+    },
+    "GhostCut Submit": { "main": [[{ "node": "Respond GhostCut", "type": "main", "index": 0 }]] },
+    "GhostCut Status": { "main": [[{ "node": "Respond GhostCut", "type": "main", "index": 0 }]] },
+
+    "Webhook: YouTube": { "main": [[{ "node": "YouTube Upload", "type": "main", "index": 0 }]] },
+    "YouTube Upload": { "main": [[{ "node": "Respond YouTube", "type": "main", "index": 0 }]] },
+
+    "Webhook: Instagram": { "main": [[{ "node": "IG Create Container", "type": "main", "index": 0 }]] },
+    "IG Create Container": { "main": [[{ "node": "IG Publish", "type": "main", "index": 0 }]] },
+    "IG Publish": { "main": [[{ "node": "Respond Instagram", "type": "main", "index": 0 }]] },
+
+    "Webhook: TikTok": { "main": [[{ "node": "TikTok Upload", "type": "main", "index": 0 }]] },
+    "TikTok Upload": { "main": [[{ "node": "Respond TikTok", "type": "main", "index": 0 }]] },
+
+    "Webhook: Facebook": { "main": [[{ "node": "Facebook Reels Upload", "type": "main", "index": 0 }]] },
+    "Facebook Reels Upload": { "main": [[{ "node": "Respond Facebook", "type": "main", "index": 0 }]] },
+
+    "Webhook: Sheets": { "main": [[{ "node": "Sheets Action Switch", "type": "main", "index": 0 }]] },
+    "Sheets Action Switch": {
+      "main": [
+        [{ "node": "Sheets Write", "type": "main", "index": 0 }],
+        [{ "node": "Sheets Read", "type": "main", "index": 0 }]
+      ]
+    },
+    "Sheets Write": { "main": [[{ "node": "Respond Sheets", "type": "main", "index": 0 }]] },
+    "Sheets Read": { "main": [[{ "node": "Respond Sheets", "type": "main", "index": 0 }]] }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

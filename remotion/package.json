@@ -1,0 +1,18 @@
+{
+  "name": "remotion-shopping-shorts",
+  "version": "1.0.0",
+  "description": "Remotion 쇼핑 쇼츠 템플릿 — 타이포 자막 + 씬 전환 + 키워드 CTA",
+  "type": "module",
+  "scripts": {
+    "studio": "npx remotion studio",
+    "render": "npx remotion render ShoppingShorts",
+    "render:test": "npx remotion render ShoppingShorts test-output.mp4 --props=src/test-props.json"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.0",
+    "@remotion/renderer": "^4.0.0",
+    "remotion": "^4.0.0",
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0"
+  }
+}

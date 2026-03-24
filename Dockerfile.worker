@@ -1,0 +1,43 @@
+FROM node:20-slim
+
+# System dependencies for Remotion (Chromium) + FFmpeg + yt-dlp
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    chromium \
+    ffmpeg \
+    python3 \
+    curl \
+    ca-certificates \
+    fonts-noto-cjk \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install yt-dlp
+RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp \
+    && chmod a+rx /usr/local/bin/yt-dlp
+
+# Chromium path for Remotion
+ENV CHROMIUM_PATH=/usr/bin/chromium
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+
+# Working directory
+WORKDIR /opt/shopping-shorts
+
+# Install Remotion dependencies
+COPY remotion/package.json remotion/
+RUN cd remotion && npm install --omit=dev
+
+# Create workspace directories
+RUN mkdir -p workspace/{downloads,cleaned,tts,output,logs}
+
+# Copy project files
+COPY remotion/ remotion/
+COPY openclaw-skills/ openclaw-skills/
+COPY config/ config/
+COPY scripts/ scripts/
+
+# Cron setup: 09:00 production + 22:00 analysis
+RUN echo '0 9 * * * /opt/shopping-shorts/scripts/run-pipeline.sh >> /opt/shopping-shorts/workspace/logs/cron.log 2>&1' > /etc/cron.d/shorts \
+    && echo '0 22 * * * /opt/shopping-shorts/scripts/run-analysis.sh >> /opt/shopping-shorts/workspace/logs/cron.log 2>&1' >> /etc/cron.d/shorts \
+    && chmod 0644 /etc/cron.d/shorts
+
+# Keep container running
+CMD ["tail", "-f", "/dev/null"]

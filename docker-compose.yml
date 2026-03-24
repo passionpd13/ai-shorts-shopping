@@ -1,0 +1,85 @@
+version: "3.8"
+
+services:
+  # n8n — 워크플로우 엔진 (Webhook 엔드포인트)
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: shorts-n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=${N8N_USER:-admin}
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD:-changeme}
+      - N8N_HOST=${N8N_HOST:-localhost}
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      - WEBHOOK_URL=${N8N_WEBHOOK_URL:-http://localhost:5678}
+      - GENERIC_TIMEZONE=Asia/Seoul
+      # API Keys (n8n 환경변수로 전달)
+      - COUPANG_ACCESS_KEY=${COUPANG_ACCESS_KEY}
+      - COUPANG_SECRET_KEY=${COUPANG_SECRET_KEY}
+      - GHOSTCUT_API_KEY=${GHOSTCUT_API_KEY}
+      - YOUTUBE_ACCESS_TOKEN=${YOUTUBE_ACCESS_TOKEN}
+      - INSTAGRAM_BUSINESS_ID=${INSTAGRAM_BUSINESS_ID}
+      - INSTAGRAM_ACCESS_TOKEN=${INSTAGRAM_ACCESS_TOKEN}
+      - TIKTOK_ACCESS_TOKEN=${TIKTOK_ACCESS_TOKEN}
+      - FACEBOOK_PAGE_ID=${FACEBOOK_PAGE_ID}
+      - FACEBOOK_PAGE_TOKEN=${FACEBOOK_PAGE_TOKEN}
+      - GOOGLE_SHEETS_ID=${GOOGLE_SHEETS_ID}
+    volumes:
+      - n8n_data:/home/node/.n8n
+      - ./n8n:/home/node/workflows
+      - ./workspace:/workspace
+    networks:
+      - shorts-net
+
+  # Worker — OpenClaw + Remotion + FFmpeg + yt-dlp
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    container_name: shorts-worker
+    restart: unless-stopped
+    environment:
+      - N8N_BASE_URL=http://n8n:5678
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - SUPERTONE_API_KEY=${SUPERTONE_API_KEY}
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID}
+      - TZ=Asia/Seoul
+    volumes:
+      - ./workspace:/opt/shopping-shorts/workspace
+      - ./remotion:/opt/shopping-shorts/remotion
+      - ./openclaw-skills:/opt/shopping-shorts/openclaw-skills
+      - ./config:/opt/shopping-shorts/config
+      - ./scripts:/opt/shopping-shorts/scripts
+    depends_on:
+      - n8n
+    networks:
+      - shorts-net
+
+  # Nginx — 리버스 프록시 (외부 Webhook 콜백용)
+  nginx:
+    image: nginx:alpine
+    container_name: shorts-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/ssl:/etc/nginx/ssl
+    depends_on:
+      - n8n
+    networks:
+      - shorts-net
+
+volumes:
+  n8n_data:
+
+networks:
+  shorts-net:
+    driver: bridge

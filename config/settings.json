@@ -1,0 +1,69 @@
+{
+  "project": "ai-shorts-shopping",
+  "version": "1.0.0",
+
+  "n8n": {
+    "base_url": "http://localhost:5678",
+    "webhook_prefix": "/webhook/shopping-shorts"
+  },
+
+  "pipeline": {
+    "cron_production": "0 9 * * *",
+    "cron_analysis": "0 22 * * *",
+    "max_retries": 2,
+    "retry_delay_seconds": 5
+  },
+
+  "categories": {
+    "1010": "뷰티",
+    "1013": "주방",
+    "1014": "생활",
+    "1019": "가전",
+    "1020": "패션",
+    "1024": "건강"
+  },
+  "default_category_order": ["1014", "1013", "1010", "1024", "1019", "1020"],
+
+  "script": {
+    "target_duration_seconds": 40,
+    "min_chars": 130,
+    "max_chars": 160,
+    "min_score": 7,
+    "max_attempts": 3,
+    "banned_words": ["쿠팡", "할인", "특가", "세일", "링크", "클릭", "구매", "프로필", "설명란"],
+    "tone": "~요 체"
+  },
+
+  "video": {
+    "min_resolution": 720,
+    "min_duration_seconds": 15,
+    "max_duration_seconds": 180,
+    "output_width": 1080,
+    "output_height": 1920,
+    "fps": 30
+  },
+
+  "tts": {
+    "provider": "supertone",
+    "voice": "cheerful",
+    "model": "sona-2",
+    "speed": 1.05,
+    "language": "ko"
+  },
+
+  "deploy": {
+    "platforms": ["youtube", "instagram", "tiktok", "facebook"],
+    "tiktok_privacy": "SELF_ONLY",
+    "legal_disclaimer": "이 포스팅은 쿠팡 파트너스 활동의 일환으로 일정액의 수수료를 제공받습니다."
+  },
+
+  "paths": {
+    "workspace": "/opt/shopping-shorts/workspace",
+    "downloads": "/opt/shopping-shorts/workspace/downloads",
+    "cleaned": "/opt/shopping-shorts/workspace/cleaned",
+    "tts": "/opt/shopping-shorts/workspace/tts",
+    "output": "/opt/shopping-shorts/workspace/output",
+    "logs": "/opt/shopping-shorts/workspace/logs",
+    "remotion": "/opt/shopping-shorts/remotion"
+  }
+}
