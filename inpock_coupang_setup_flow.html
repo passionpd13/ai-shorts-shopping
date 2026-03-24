@@ -1,0 +1,145 @@
+<style>
+  .setup-card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:12px 14px;margin:0 0 8px}
+  .setup-head{display:flex;align-items:center;gap:8px;margin:0 0 6px}
+  .setup-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0}
+  .setup-title{font-size:14px;font-weight:500;color:var(--color-text-primary)}
+  .setup-desc{font-size:12px;color:var(--color-text-secondary);line-height:1.6;margin:0 0 4px}
+  .setup-key{font-size:11px;font-family:var(--font-mono);color:var(--color-text-tertiary);margin:4px 0 0}
+  .divider{border:0;border-top:0.5px solid var(--color-border-tertiary);margin:14px 0}
+  .flow-row{display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin:0 0 6px}
+  .flow-box{font-size:11px;padding:4px 8px;border-radius:var(--border-radius-md);white-space:nowrap}
+  .flow-arrow{font-size:11px;color:var(--color-text-tertiary)}
+  .tmpl{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:8px 10px;margin:4px 0 6px;font-size:12px;line-height:1.6;color:var(--color-text-primary)}
+</style>
+
+<p style="font-size:16px;font-weight:500;margin:0 0 4px">인포크 + 쿠팡 파트너스 — 수익화 설정 가이드</p>
+<p style="font-size:12px;color:var(--color-text-secondary);margin:0 0 12px">6개 Part, 302줄. 설정 완료 시 "댓글 하나 → 커미션 수익" 자동화 완성</p>
+
+<p style="font-size:13px;font-weight:500;margin:0 0 6px">시청자가 경험하는 흐름</p>
+<div class="flow-row">
+  <span class="flow-box" style="background:#F1EFE8;color:#444441">릴스 시청</span>
+  <span class="flow-arrow">→</span>
+  <span class="flow-box" style="background:#FAECE7;color:#712B13">댓글 "청소"</span>
+  <span class="flow-arrow">→</span>
+  <span class="flow-box" style="background:#FBEAF0;color:#72243E">인포크 매니저 감지</span>
+  <span class="flow-arrow">→</span>
+  <span class="flow-box" style="background:#FBEAF0;color:#72243E">DM 자동 발송</span>
+  <span class="flow-arrow">→</span>
+  <span class="flow-box" style="background:#EEEDFE;color:#3C3489">인포크링크 클릭</span>
+  <span class="flow-arrow">→</span>
+  <span class="flow-box" style="background:#E6F1FB;color:#0C447C">쿠팡 이동</span>
+  <span class="flow-arrow">→</span>
+  <span class="flow-box" style="background:#E1F5EE;color:#085041">구매 → 3%</span>
+</div>
+
+<hr class="divider">
+
+<div class="setup-card" style="border-left:3px solid #BA7517;border-radius:0">
+  <div class="setup-head">
+    <div class="setup-num" style="background:#FAEEDA;color:#633806">1</div>
+    <span class="setup-title">쿠팡 파트너스 가입 + API 키</span>
+  </div>
+  <p class="setup-desc">partners.coupang.com 가입 → 계좌 등록 → 도구 → API → 키 생성. 가입 즉시 링크 생성 가능, 최종 승인은 첫 매출 15만원 후.</p>
+  <p class="setup-key">→ COUPANG_ACCESS_KEY, COUPANG_SECRET_KEY, COUPANG_PARTNER_ID</p>
+</div>
+
+<div class="setup-card" style="border-left:3px solid #D4537E;border-radius:0">
+  <div class="setup-head">
+    <div class="setup-num" style="background:#FBEAF0;color:#72243E">2</div>
+    <span class="setup-title">인포크 가입 + 매니저 플랜 구독</span>
+  </div>
+  <p class="setup-desc">inpock.co.kr 가입 → Instagram 비즈니스 계정 연결 → 매니저 플랜(월 18,000원~) 선택. DM 자동화는 매니저 플랜에서만 가능. 프로플랜(5,900원)은 링크만 가능.</p>
+</div>
+
+<div class="setup-card" style="border-left:3px solid #534AB7;border-radius:0">
+  <div class="setup-head">
+    <div class="setup-num" style="background:#EEEDFE;color:#3C3489">3</div>
+    <span class="setup-title">인포크링크 페이지 + 쿠팡 연동</span>
+  </div>
+  <p class="setup-desc">인포크링크 페이지 생성 → 파트너스 탭에서 쿠팡 연동 (API 키 입력) → 상품별 링크 블록 추가. Instagram 프로필 웹사이트에 인포크링크 URL 연결.</p>
+  <p class="setup-key">→ 프로필: inpock.co.kr/내계정이름</p>
+</div>
+
+<div class="setup-card" style="border-left:3px solid #E24B4A;border-radius:0">
+  <div class="setup-head">
+    <div class="setup-num" style="background:#FCEBEB;color:#791F1F">4</div>
+    <span class="setup-title">인포크 매니저 — 게시물별 DM 자동화</span>
+  </div>
+  <p class="setup-desc">릴스 업로드 후 → 인포크매니저에서 해당 게시물 선택 → 키워드 설정 → 팔로워/비팔로워 메시지 작성 → CTA 버튼에 인포크링크 URL → 활성화. 게시물마다 반복.</p>
+</div>
+
+<hr class="divider">
+
+<p style="font-size:13px;font-weight:500;margin:0 0 6px">키워드 → DM 설정 상세 (매 쇼츠마다 반복)</p>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 0 8px">
+  <div>
+    <p style="font-size:12px;font-weight:500;color:var(--color-text-primary);margin:0 0 4px">키워드 설정</p>
+    <p style="font-size:11px;color:var(--color-text-secondary);line-height:1.5;margin:0">쉼표로 여러 키워드 등록 가능. "포함" 매칭이라 "청소기"에 "청소"가 포함되면 트리거됨.</p>
+    <div class="tmpl" style="font-size:11px">청소, 청소기, 추천</div>
+  </div>
+  <div>
+    <p style="font-size:12px;font-weight:500;color:var(--color-text-primary);margin:0 0 4px">자동 답글 (선택)</p>
+    <p style="font-size:11px;color:var(--color-text-secondary);line-height:1.5;margin:0">댓글에 자동으로 답글도 달 수 있음. 여러 개 등록하면 랜덤 선택.</p>
+    <div class="tmpl" style="font-size:11px">DM으로 정보 보내드렸어요! 😊</div>
+  </div>
+</div>
+
+<p style="font-size:12px;font-weight:500;color:var(--color-text-primary);margin:0 0 4px">팔로워용 DM 메시지</p>
+<div class="tmpl">안녕하세요! 관심 가져주셔서 감사해요 😊<br>영상 속 제품 정보 보내드릴게요!<br>아래 버튼을 눌러 확인해주세요 👇<br><br><span style="display:inline-block;background:#EEEDFE;padding:2px 8px;border-radius:4px;font-size:11px;color:#3C3489">[ 제품 정보 바로 보기 → inpock.co.kr/내계정 ]</span></div>
+
+<p style="font-size:12px;font-weight:500;color:var(--color-text-primary);margin:0 0 4px">비팔로워용 DM 메시지</p>
+<div class="tmpl">안녕하세요! 관심 감사합니다 😊<br>팔로우하시면 좋은 제품 정보를 더 빠르게 받아보실 수 있어요!<br>아래 버튼을 눌러 제품 정보를 확인해주세요 👇<br><br><span style="display:inline-block;background:#EEEDFE;padding:2px 8px;border-radius:4px;font-size:11px;color:#3C3489">[ 제품 정보 보기 → inpock.co.kr/내계정 ]</span></div>
+
+<hr class="divider">
+
+<p style="font-size:13px;font-weight:500;margin:0 0 6px">상품별 키워드 + DM 매핑</p>
+
+<div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin:0 0 12px">
+  <div style="background:#FBEAF0;border-radius:var(--border-radius-md);padding:6px 4px;text-align:center">
+    <p style="font-size:11px;font-weight:500;color:#72243E;margin:0">수분크림</p>
+    <p style="font-size:10px;color:#993556;margin:2px 0 0">키워드: 피부</p>
+  </div>
+  <div style="background:#FAEEDA;border-radius:var(--border-radius-md);padding:6px 4px;text-align:center">
+    <p style="font-size:11px;font-weight:500;color:#633806;margin:0">블렌더</p>
+    <p style="font-size:10px;color:#854F0B;margin:2px 0 0">키워드: 요리</p>
+  </div>
+  <div style="background:#E1F5EE;border-radius:var(--border-radius-md);padding:6px 4px;text-align:center">
+    <p style="font-size:11px;font-weight:500;color:#085041;margin:0">청소기</p>
+    <p style="font-size:10px;color:#0F6E56;margin:2px 0 0">키워드: 청소</p>
+  </div>
+  <div style="background:#EEEDFE;border-radius:var(--border-radius-md);padding:6px 4px;text-align:center">
+    <p style="font-size:11px;font-weight:500;color:#3C3489;margin:0">루테인</p>
+    <p style="font-size:10px;color:#534AB7;margin:2px 0 0">키워드: 건강</p>
+  </div>
+  <div style="background:#E6F1FB;border-radius:var(--border-radius-md);padding:6px 4px;text-align:center">
+    <p style="font-size:11px;font-weight:500;color:#0C447C;margin:0">이어폰</p>
+    <p style="font-size:10px;color:#185FA5;margin:2px 0 0">키워드: 음악</p>
+  </div>
+</div>
+
+<p style="font-size:13px;font-weight:500;margin:0 0 6px">주의사항</p>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:0 0 12px">
+  <div style="background:#FCEBEB;border-radius:var(--border-radius-md);padding:6px 8px">
+    <p style="font-size:11px;font-weight:500;color:#791F1F;margin:0">Instagram 24시간 룰</p>
+    <p style="font-size:10px;color:#A32D2D;margin:2px 0 0;line-height:1.5">댓글 후 24시간 이내에만 DM 발송 가능. 시간당 200건 제한.</p>
+  </div>
+  <div style="background:#FAEEDA;border-radius:var(--border-radius-md);padding:6px 8px">
+    <p style="font-size:11px;font-weight:500;color:#633806;margin:0">쿠팡 쿠키 24시간</p>
+    <p style="font-size:10px;color:#854F0B;margin:2px 0 0;line-height:1.5">인포크링크→쿠팡 클릭 후 24시간 내 구매 시 커미션. 다른 상품도 OK.</p>
+  </div>
+  <div style="background:#E1F5EE;border-radius:var(--border-radius-md);padding:6px 8px">
+    <p style="font-size:11px;font-weight:500;color:#085041;margin:0">Meta 공식 API만</p>
+    <p style="font-size:10px;color:#0F6E56;margin:2px 0 0;line-height:1.5">인포크 매니저는 Meta 공식 API 기반. 비공식 도구는 계정 정지 위험.</p>
+  </div>
+  <div style="background:#EEEDFE;border-radius:var(--border-radius-md);padding:6px 8px">
+    <p style="font-size:11px;font-weight:500;color:#3C3489;margin:0">전환율 팁</p>
+    <p style="font-size:10px;color:#534AB7;margin:2px 0 0;line-height:1.5">인포크링크 최상단에 최신 상품 배치. 버튼 텍스트는 "내가 쓰는 제품 보기"식이 효과적.</p>
+  </div>
+</div>
+
+<div style="margin:8px 0 0">
+  <button onclick="sendPrompt('전체 프로젝트를 하나의 PDF 보고서로 정리해줘. 아키텍처 + 코드 + 가이드 전부 포함.')">전체 PDF 보고서 정리 ↗</button>
+  <button onclick="sendPrompt('서버에 배포하려고 해. 어떤 VPS가 좋은지, 첫 배포 시 체크리스트를 알려줘')" style="margin-left:6px">실전 배포 ↗</button>
+</div>
